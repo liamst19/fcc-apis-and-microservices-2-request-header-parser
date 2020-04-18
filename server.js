@@ -3,6 +3,7 @@
 
 // init project
 var express = require('express');
+var useragent = require('express-useragent');
 var app = express();
 
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
@@ -12,6 +13,8 @@ app.use(cors({optionSuccessStatus: 200}));  // some legacy browsers choke on 204
 
 // http://expressjs.com/en/starter/static-files.html
 app.use(express.static('public'));
+
+app.use(useragent.express());
 
 // http://expressjs.com/en/starter/basic-routing.html
 app.get("/", function (req, res) {
@@ -24,7 +27,15 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
-
+app.get('/api/whoami', (req, res) => {
+  const ua = req.headers['user-agent'];
+  console.log(req.headers);
+  res.json({
+    "ipaddress": req.header['x-forwarded-for') || req.connection.remoteAddress,
+    "language": req.headers['accept-language'],
+    "software": req.headers['user-agent']
+  });
+})
 
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
